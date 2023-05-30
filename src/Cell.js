@@ -1,6 +1,11 @@
 const Cell = ({ cell, i, j, handleCellClick }) => {
-  const { isShown, minesAroundCount } = cell
+  const { isShown, minesAroundCount, isMine } = cell
 
-  return <td onClick={() => handleCellClick(i, j)}>{isShown ? minesAroundCount : ''}</td>
+  const showCell = () => {
+    if (isMine) return '💣'
+    if (minesAroundCount) return minesAroundCount
+  }
+
+  return <td onClick={() => handleCellClick(i, j)}>{isShown && showCell()}</td>
 }
 export default Cell
