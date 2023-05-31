@@ -55,7 +55,9 @@ const Board = () => {
   const handleCellClick = (i, j) => {
     const cell = board[i][j]
     if (cell.isShown || cell.isMarked) return
-    if (!gameDetails.isOn) handleFirstCellClick(i, j)
+    if (!gameDetails.isOn) {
+      handleFirstCellClick(i, j)
+    }
 
     const updatedBoard = [...board]
     updatedBoard[i][j] = {
@@ -65,7 +67,7 @@ const Board = () => {
     setBoard(updatedBoard)
 
     if (cell.isMine) return // onMineCellClick(elCell, i, j)
-    if (cell.isMarked) return // onMineCellClick(elCell, i, j)
+    if (cell.isMarked) return
     else if (cell.minesAroundCount === 0) expandShown(updatedBoard, i, j)
   }
 
@@ -77,21 +79,20 @@ const Board = () => {
 
     const putMinesinRandomPos = (cellI, cellJ) => {
       const updatedBoard = [...board]
-
       let minesCount = 0
 
       while (minesCount < gameDetails.totalMinesCount) {
         let randomI = Math.floor(Math.random() * boardSize)
         let randomJ = Math.floor(Math.random() * boardSize)
 
-        if (updatedBoard[randomI][randomJ].isMine) continue
-        if (randomI === cellI && randomJ === cellJ) continue
+        if (updatedBoard[randomI][randomJ].isMine || (randomI === cellI && randomJ === cellJ)) {
+          continue
+        }
 
         updatedBoard[randomI][randomJ] = {
           ...updatedBoard[randomI][randomJ],
           isMine: true,
         }
-
         minesCount++
       }
       setBoard(updatedBoard)
@@ -105,10 +106,11 @@ const Board = () => {
         for (let j = cellJ - 1; j <= cellJ + 1; j++) {
           if (i === cellI && j === cellJ) continue
           if (j < 0 || j >= board.length) continue
-          let currCell = board[i][j]
+          let currCell = updatedBoard[i][j]
           if (currCell.isMine) count++
         }
       }
+
       updatedBoard[cellI][cellJ] = {
         ...updatedBoard[cellI][cellJ],
         minesAroundCount: count,
@@ -117,6 +119,7 @@ const Board = () => {
     }
 
     putMinesinRandomPos(i, j)
+
     for (let i = 0; i < boardSize; i++) {
       for (let j = 0; j < boardSize; j++) {
         countMinesAround(i, j)
@@ -134,7 +137,6 @@ const Board = () => {
       isMarked: !updatedBoard[i][j].isMarked,
     }
     setBoard(updatedBoard)
-    // clickedCell.isMarked = !clickedCell.isMarked
   }
 
   if (!board) return <h1>Loading...</h1>
