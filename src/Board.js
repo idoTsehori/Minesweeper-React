@@ -14,9 +14,8 @@ const Board = () => {
   })
 
   const [board, setBoard] = useState(null)
-  const [boardSize, setBoardSize] = useState(3)
+  const [boardSize, setBoardSize] = useState(5)
 
-  console.log(board)
   useEffect(() => {
     builtBoard()
   }, [boardSize])
@@ -37,9 +36,31 @@ const Board = () => {
     setBoard(board)
   }
 
+  const expandShown = (cellI, cellJ) => {
+    for (let i = cellI - 1; i <= cellI + 1; i++) {
+      if (i < 0 || i >= board.length) continue
+      for (let j = cellJ - 1; j <= cellJ + 1; j++) {
+        if (j < 0 || j >= board[0].length) continue
+        let currCell = board[i][j]
+        console.log('currCell:', currCell)
+
+        if (currCell.isShown) continue
+        if (!currCell.minesAroundCount) {
+          // handleCellClick(i, j)
+          // Recursive Expand:
+          expandShown(i, j)
+        } else {
+          handleCellClick(i, j)
+        }
+      }
+    }
+  }
+
   const handleCellClick = (i, j) => {
     if (board[i][j].isShown) return
     if (!gameDetails.isOn) handleFirstCellClick(i, j)
+
+    // expandShown(i, j)
 
     const updatedBoard = [...board]
     updatedBoard[i][j] = {
@@ -76,6 +97,7 @@ const Board = () => {
       }
       setBoard(updatedBoard)
     }
+
     const countMinesAround = (cellI, cellJ) => {
       let count = 0
       const updatedBoard = [...board]
@@ -96,7 +118,6 @@ const Board = () => {
     }
 
     putMinesinRandomPos(i, j)
-
     for (let i = 0; i < boardSize; i++) {
       for (let j = 0; j < boardSize; j++) {
         countMinesAround(i, j)
