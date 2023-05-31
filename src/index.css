@@ -12,7 +12,7 @@ code {
 
 .board {
   margin: auto; /* Remove after */
-  margin-top: 5em; /* Remove after */
+  /* margin-top: 1em; Remove after */
   border: 1px solid black;
   border-collapse: collapse;
 }
@@ -22,6 +22,8 @@ code {
   padding: 1em;
   background-color: rgba(255, 245, 231, 0.839);
   cursor: pointer;
+  width: 1.3em;
+  height: 1.5em;
 }
 
 .clicked {

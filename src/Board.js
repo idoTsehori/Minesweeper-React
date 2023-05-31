@@ -4,6 +4,7 @@ import Cell from './Cell'
 import { nanoid } from 'nanoid'
 
 const Board = () => {
+  const [boardSize, setBoardSize] = useState(8)
   const [gameDetails, setGameDetails] = useState({
     isOn: false,
     shownCount: 0,
@@ -12,9 +13,7 @@ const Board = () => {
     lives: 3,
     totalMinesCount: 2,
   })
-
   const [board, setBoard] = useState(null)
-  const [boardSize, setBoardSize] = useState(5)
 
   useEffect(() => {
     builtBoard()
@@ -36,20 +35,17 @@ const Board = () => {
     setBoard(board)
   }
 
-  const expandShown = (cellI, cellJ) => {
+  const expandShown = (updatedBoard, cellI, cellJ) => {
     for (let i = cellI - 1; i <= cellI + 1; i++) {
-      if (i < 0 || i >= board.length) continue
+      if (i < 0 || i >= updatedBoard.length) continue
       for (let j = cellJ - 1; j <= cellJ + 1; j++) {
-        if (j < 0 || j >= board[0].length) continue
-        let currCell = board[i][j]
-        console.log('currCell:', currCell)
+        if (j < 0 || j >= updatedBoard[0].length) continue
+        let currCell = updatedBoard[i][j]
 
-        if (currCell.isShown) continue
-        if (!currCell.minesAroundCount) {
-          // handleCellClick(i, j)
-          // Recursive Expand:
-          expandShown(i, j)
-        } else {
+        if (!currCell.isShown && !currCell.minesAroundCount) {
+          handleCellClick(i, j)
+          expandShown(updatedBoard, i, j)
+        } else if (!currCell.isShown) {
           handleCellClick(i, j)
         }
       }
@@ -57,10 +53,9 @@ const Board = () => {
   }
 
   const handleCellClick = (i, j) => {
-    if (board[i][j].isShown) return
+    const cell = board[i][j]
+    if (cell.isShown || cell.isMarked) return
     if (!gameDetails.isOn) handleFirstCellClick(i, j)
-
-    // expandShown(i, j)
 
     const updatedBoard = [...board]
     updatedBoard[i][j] = {
@@ -68,6 +63,10 @@ const Board = () => {
       isShown: true,
     }
     setBoard(updatedBoard)
+
+    if (cell.isMine) return // onMineCellClick(elCell, i, j)
+    if (cell.isMarked) return // onMineCellClick(elCell, i, j)
+    else if (cell.minesAroundCount === 0) expandShown(updatedBoard, i, j)
   }
 
   const handleFirstCellClick = (i, j) => {
@@ -125,6 +124,19 @@ const Board = () => {
     }
   }
 
+  const handleRightClick = (ev, i, j) => {
+    ev.preventDefault()
+    const clickedCell = board[i][j]
+    if (clickedCell.isMine && clickedCell.isShown) return
+    const updatedBoard = [...board]
+    updatedBoard[i][j] = {
+      ...updatedBoard[i][j],
+      isMarked: !updatedBoard[i][j].isMarked,
+    }
+    setBoard(updatedBoard)
+    // clickedCell.isMarked = !clickedCell.isMarked
+  }
+
   if (!board) return <h1>Loading...</h1>
 
   return (
@@ -139,6 +151,7 @@ const Board = () => {
                     i={iIdx}
                     j={jIdx}
                     handleCellClick={handleCellClick}
+                    handleRightClick={handleRightClick}
                     key={nanoid()}
                     cell={cell}
                   />
