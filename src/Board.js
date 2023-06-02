@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Cell from './Cell'
 
 import { nanoid } from 'nanoid'
 
 const Board = () => {
   const [boardSize, setBoardSize] = useState(8)
+  // const [isFirstClick, setIsFirstClick] = useState(true)
   const [gameDetails, setGameDetails] = useState({
     isOn: false,
     shownCount: 0,
@@ -52,18 +53,18 @@ const Board = () => {
     }
   }
 
-  const handleCellClick = (i, j) => {
+  const handleCellClick = async (i, j) => {
     const cell = board[i][j]
     if (cell.isShown || cell.isMarked) return
     if (!gameDetails.isOn) {
       handleFirstCellClick(i, j)
     }
-
     const updatedBoard = [...board]
     updatedBoard[i][j] = {
       ...updatedBoard[i][j],
       isShown: true,
     }
+
     setBoard(updatedBoard)
 
     if (cell.isMine) return // onMineCellClick(elCell, i, j)
@@ -72,10 +73,8 @@ const Board = () => {
   }
 
   const handleFirstCellClick = (i, j) => {
-    setGameDetails((prevState) => ({
-      ...prevState,
-      isOn: true,
-    }))
+    console.log('first ')
+    setGameDetails((prevState) => ({ ...prevState, isOn: true }))
 
     const putMinesinRandomPos = (cellI, cellJ) => {
       const updatedBoard = [...board]
@@ -117,7 +116,6 @@ const Board = () => {
       }
       setBoard(updatedBoard)
     }
-
     putMinesinRandomPos(i, j)
 
     for (let i = 0; i < boardSize; i++) {
