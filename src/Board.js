@@ -53,12 +53,29 @@ const Board = () => {
     }
   }
 
-  const handleCellClick = async (i, j) => {
+  const updateBoard = () => {}
+
+  const handleCellClick = (i, j) => {
     const cell = board[i][j]
     if (cell.isShown || cell.isMarked) return
+
     if (!gameDetails.isOn) {
       handleFirstCellClick(i, j)
+
+      const updatedBoard = [...board]
+      updatedBoard[i][j] = {
+        ...updatedBoard[i][j],
+        isShown: true,
+      }
+
+      setBoard(updatedBoard)
+
+      if (cell.isMine) return // onMineCellClick(elCell, i, j)
+      if (cell.isMarked) return
+      else if (cell.minesAroundCount === 0) expandShown(updatedBoard, i, j)
+      return
     }
+
     const updatedBoard = [...board]
     updatedBoard[i][j] = {
       ...updatedBoard[i][j],
